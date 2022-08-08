@@ -15,13 +15,10 @@ window.addEventListener('DOMContentLoaded', async(event) => {
     console.log(setting)
     console.log(setting?.mona?.address)
     //uploader.setup()
-    document.getElementById('post-list').innerHTML = await db.toHtml()
+    if (setting?.mona?.address) { document.getElementById('address').value = setting.mona.address }
+    document.getElementById('post-list').innerHTML = await db.toHtml(document.getElementById('address').value)
     document.getElementById('content').focus()
     document.getElementById('content-length').textContent = LENGTH;
-    if (setting?.mona?.address) {
-        document.getElementById('address').value = setting.mona.address;
-    }
-
     document.querySelector('#post').addEventListener('click', async()=>{
         document.getElementById('post-list').innerHTML = 
             db.insert(document.getElementById('content').value)
@@ -29,8 +26,9 @@ window.addEventListener('DOMContentLoaded', async(event) => {
     })
     document.querySelector('#delete').addEventListener('click', async()=>{
         const ids = Array.from(document.querySelectorAll(`#post-list input[type=checkbox][name=delete]:checked`)).map(d=>parseInt(d.value))
-        console.debug(deletes)
-        window.myApi.delete(ids);
+        console.debug(ids)
+        //window.myApi.delete(ids);
+        db.delete(ids)
     })
     /*
     document.querySelector('#download').addEventListener('click', async()=>{

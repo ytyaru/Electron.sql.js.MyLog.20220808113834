@@ -32,7 +32,7 @@ class MyLogDb {
             //console.debug(await this.dexie.comments.toArray())
         }
     }
-    async insert(content) {
+    async insert(content, address=null) {
         //const content = document.getElementById('content').value
         if (!content) { alert('つぶやく内容をテキストエリアに入力してください。'); return; }
         if (this.LENGTH < content.length) { alert(`つぶやく内容は${this.LENGTH}字以内にしてください。`); return; }
@@ -40,7 +40,8 @@ class MyLogDb {
         if (match && this.LINE < match.length) { alert(`つぶやく内容は${this.LINE}行以内にしてください。`); return; }
         const now = Math.floor(new Date().getTime() / 1000)
         const r = window.myApi.insert({content:content, created:now});
-        return this.#insertHtml(r.id, r.content, r.created)
+        return TextToHtml.toHtml(r.id, r.content, r.created, address)
+        //return this.#insertHtml(r.id, r.content, r.created)
     }
     /*
     async insert(content, now) {
@@ -56,14 +57,14 @@ class MyLogDb {
     }
     */
     #insertHtml(id, content, created) { return `<p>${this.#toContent(content)}<br>${this.#toTime(created)}${this.#toDeleteCheckbox(id)}</p>` }
-    async toHtml() {
+    async toHtml(address=null) {
         const cms = await window.myApi.get()
         //cms.sort((a,b)=>b[0] - a[0])
         //cms.sort((a,b)=>b.created - a.created)
         //const address = (window.mpurse) ? await window.mpurse.getAddress() : null
         //return cms.map(c=>TextToHtml.toHtml(c.id, c.content, c.created, address)).join('')
         //return cms.map(c=>TextToHtml.toHtml(c.id, c.content, c.created)).join('')
-        return cms.map(c=>TextToHtml.toHtml(c[0], c[1], c[2])).join('')
+        return cms.map(c=>TextToHtml.toHtml(c[0], c[1], c[2], address)).join('')
     }
     /*
     async toHtml() {
