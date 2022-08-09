@@ -39,23 +39,14 @@ app.on('window-all-closed', function () {
 async function loadDb(filePath=`src/db/mylog.db`) {
     if (null === filePath) { filePath = `src/db/mylog.db` }
     if (!lib.has(`DB`)) {
-        const fs = require('fs')
         const SQL = await initSqlJs().catch(e=>console.error(e))
         lib.set(`SQL`, SQL)
         const db = new SQL.Database(new Uint8Array(fs.readFileSync(filePath)))
         lib.set(`DB`, db)
-        console.log(db)
-        console.log(db.exec)
-        const res = db.exec(`select * from comments;`)
-        console.log(res)
     }
-    //console.log(lib)
     return lib.get(`DB`)
 }
-function readFile(path, kwargs) {
-    //if (!kwargs) { kwargs = { encoding: 'utf8' } }
-    return fs.readFileSync(path, kwargs)
-}
+function readFile(path, kwargs) { return fs.readFileSync(path, kwargs) }
 
 // ここではdb.execを参照できるが、return後では参照できない謎
 ipcMain.handle('loadDb', async(event, filePath=null) => {
@@ -66,20 +57,17 @@ ipcMain.handle('loadDb', async(event, filePath=null) => {
 ipcMain.handle('get', async(event) => {
     console.log('----- get ----- ')
     if (!lib.has(`SQL`)) {
-        //await ipcRenderer.invoke('loadDb', filePath),
         loadDb()
     }
-    //console.log(lib)
-    //console.log(lib.get(`DB`))
     const res = lib.get(`DB`).exec(`select * from comments order by created desc;`)
-    //console.log(res)
     return res[0].values
 })
 ipcMain.handle('insert', async(event, r)=>{
     if (!lib.has(`SQL`)) {loadDb()}
-    const record = lib.get(`DB`).exec(`insert into comments(content, created) values('${r.content}', r.created);`)
-    console.log(record)
-    return record
+    console.debug(r)
+    lib.get(`DB`).exec(`insert into comments(content, created) values('${r.content}', ${r.created});`)
+    const res = lib.get(`DB`).exec(`select * from comments where created = ${r.created};`)
+    return res[0].values[0]
 })
 ipcMain.handle('clear', async(event)=>{
     lib.get(`DB`).exec(`delete from comments;`)

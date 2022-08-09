@@ -1,7 +1,6 @@
 class TextToHtml {
     static now = new Date()
     static toHtml(id, content, created, address=null, isFixedHtml=false) {
-        console.log('XXXXXXXXXXXXXX')
         console.log(address)
         return `<a id="${id}" class="anchor"></a><div class="mylog"><p>${this.br(this.autoLink(content))}</p><div class="mylog-meta">${this.#toTime(created, isFixedHtml)}${(isFixedHtml) ? '' : this.#toDeleteCheckbox(id)}<a href="#${id}">🔗</a>${this.#toMpurseButton(address)}</div></div>`
     }
